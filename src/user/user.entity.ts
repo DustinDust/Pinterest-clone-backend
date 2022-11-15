@@ -1,7 +1,9 @@
+import { Board } from 'src/board/board.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -25,6 +27,9 @@ export class User {
 
   @Column({ nullable: true })
   hashRefeshToken: string;
+
+  @OneToMany(() => Board, (board) => board.user)
+  boards: Board[];
 
   @CreateDateColumn()
   createdAt: Date;

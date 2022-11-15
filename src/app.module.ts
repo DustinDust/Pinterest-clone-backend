@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { FirebaseModule } from './firebase/firebase.module';
+import { BoardModule } from './board/board.module';
+import { ImageModule } from './image/image.module';
+import { PinModule } from './pin/pin.module';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { FirebaseModule } from './firebase/firebase.module';
     UserModule,
     AuthModule,
     FirebaseModule,
+    BoardModule,
+    ImageModule,
+    PinModule,
   ],
   controllers: [],
   providers: [],
