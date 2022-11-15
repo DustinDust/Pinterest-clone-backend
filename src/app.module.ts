@@ -5,7 +5,6 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { BoardModule } from './board/board.module';
-import { ImageModule } from './image/image.module';
 import { PinModule } from './pin/pin.module';
 
 @Module({
@@ -31,7 +30,6 @@ import { PinModule } from './pin/pin.module';
     AuthModule,
     FirebaseModule,
     BoardModule,
-    ImageModule,
     PinModule,
   ],
   controllers: [],
