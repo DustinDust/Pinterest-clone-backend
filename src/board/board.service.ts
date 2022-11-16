@@ -1,15 +1,18 @@
 import {
+  BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FirebaseService } from 'src/firebase/firebase.service';
 import { Pin } from 'src/pin/pin.entity';
 import { User } from 'src/user/user.entity';
-import { ArrayContains, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Board, Visibility } from './board.entity';
+import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from './dto/page.dto';
+import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
@@ -18,6 +21,7 @@ export class BoardService {
     @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(User) private userRepsitory: Repository<User>,
     @InjectRepository(Pin) private pinRepository: Repository<Pin>,
+    private firebaseService: FirebaseService,
   ) {}
 
   async createBoard(userId: number, boardDto: BaseBoardDto) {
@@ -29,28 +33,65 @@ export class BoardService {
     try {
       const user = await this.userRepsitory.findOneBy({ id: userId });
       board.user = user;
-      return await this.boardRepository.save(board);
+      await this.boardRepository.save(board);
+      return {
+        ...boardDto,
+        user: {
+          id: user.id,
+        },
+      };
     } catch (e) {
       throw new UnauthorizedException(e);
     }
   }
 
-  async savePinToBoard(userId: number, pin: any, boardId: number) {
-    const board = await this.boardRepository.findOneBy({ id: boardId });
+  async savePinToBoard(
+    userId: number,
+    pinDto: AddPinDto,
+    boardId: number,
+    image: Express.Multer.File,
+  ) {
+    let pin: Pin;
+    const board = await this.boardRepository.findOne({
+      relations: { user: true, pins: true },
+      where: { id: boardId },
+      select: { user: { id: true }, pins: { id: true } },
+    });
     if (!board) {
-      throw new NotFoundException('Board not found!');
+      throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
       throw new UnauthorizedException(
         'User does not have authority to modify this board',
       );
     }
-    if (!pin.id) {
-      // TODO: create a pin
+    if (!pinDto.id) {
+      if (!image && !pinDto.url) {
+        throw new BadRequestException(
+          'Url or file is required to create completely new pin',
+        );
+      }
+      pin = this.pinRepository.create();
+      let url: string;
+      if (pinDto.url) {
+        url = pinDto.url;
+      } else {
+        url = await this.firebaseService.uploadFile(image);
+        pin.url = url;
+        pin.filename = image.originalname;
+      }
+      if (!pinDto.name) {
+        throw new BadRequestException('Pin must have a name.');
+      }
+      pin.name = pinDto.name;
+      await this.pinRepository.save(pin);
     } else {
-      pin = this.pinRepository.findOneBy({ id: pin.id });
+      pin = await this.pinRepository.findOneBy({ id: pinDto.id });
+      if (!pin) {
+        throw new BadRequestException('Pin does not exist.');
+      }
     }
-    board.pins.push(pin);
+    board.pins = [...board.pins, pin];
     return await this.boardRepository.save(board);
   }
 
@@ -59,9 +100,14 @@ export class BoardService {
     boardId: number,
     boardDto: UpdateBoardDto,
   ) {
-    const board = await this.boardRepository.findOneBy({ id: boardId });
+    const board = await this.boardRepository.findOne({
+      relations: {
+        user: true,
+      },
+      where: { id: boardId },
+    });
     if (!board) {
-      throw new NotFoundException('Board not found!');
+      throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
       throw new UnauthorizedException(
@@ -78,7 +124,11 @@ export class BoardService {
       board.visibility =
         boardDto.visibility === 0 ? Visibility.PRIVATE : Visibility.PUBLIC;
     }
-    return await this.boardRepository.save(board);
+    await this.boardRepository.save(board);
+    return {
+      id: boardId,
+      ...boardDto,
+    };
   }
 
   async deleteBoard(userId: number, boardId: number) {
@@ -91,14 +141,16 @@ export class BoardService {
       },
     });
     if (!board) {
-      throw new NotFoundException('Board not found!');
+      throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
       throw new UnauthorizedException(
         'User does not have authority to modify this board',
       );
     }
-    return await this.boardRepository.delete(board);
+    return await this.boardRepository.delete({
+      id: boardId,
+    });
   }
 
   async getBoardsByUser(curUserId: number, userId: number) {
@@ -109,6 +161,11 @@ export class BoardService {
       where: {
         user: {
           id: userId,
+        },
+      },
+      select: {
+        user: {
+          id: true,
         },
       },
     });
@@ -130,7 +187,7 @@ export class BoardService {
       },
     });
     if (!board) {
-      throw new NotFoundException('Board not found!');
+      throw new BadRequestException('Board not found!');
     }
     if (board.visibility === Visibility.PRIVATE) {
       if (board.user.id !== userId) {
@@ -139,15 +196,68 @@ export class BoardService {
         );
       }
     }
-    return await this.pinRepository.find({
+    const boardPins = await this.pinRepository.find({
       relations: {
         boards: true,
       },
       where: {
-        boards: ArrayContains([board]),
+        boards: {
+          id: boardId,
+        },
+      },
+      select: {
+        boards: false,
       },
       take: page.pageSize,
-      skip: (page.pageNum - 1) * page.pageSize,
+      skip: page.pageSize * (page.pageNum - 1),
     });
+    return boardPins;
+  }
+
+  async removePinsFromBoard(
+    userId: number,
+    boardId: number,
+    data: RemovePinDto[],
+  ) {
+    const board = await this.boardRepository.findOne({
+      relations: {
+        user: true,
+        pins: true,
+      },
+      where: {
+        id: boardId,
+      },
+      select: {
+        user: {
+          id: true,
+        },
+        pins: {
+          id: true,
+        },
+      },
+    });
+    if (!board) {
+      throw new BadRequestException('Board does not exist');
+    }
+    if (board.user.id !== userId) {
+      throw new UnauthorizedException(
+        'User does not have authority over this board',
+      );
+    }
+    board.pins = board.pins.filter((p) => {
+      return data.findIndex((pin) => p.id === pin.id) < 0;
+    });
+    for (const datum of data) {
+      const pin = await this.pinRepository.findOne({
+        relations: { boards: true },
+        where: { id: datum.id },
+      });
+      if (pin.boards.length === 0) {
+        if (pin.filename) {
+          this.firebaseService.removeFile(pin.filename);
+        }
+      }
+    }
+    return await this.boardRepository.save(board);
   }
 }

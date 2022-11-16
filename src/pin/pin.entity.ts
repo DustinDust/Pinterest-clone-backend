@@ -1,5 +1,11 @@
 import { Board } from 'src/board/board.entity';
-import { Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Pin {
@@ -8,4 +14,16 @@ export class Pin {
 
   @ManyToMany(() => Board, (board) => board.pins)
   boards: Board[];
+
+  @Column({ nullable: false })
+  url: string;
+
+  @Column({ nullable: true })
+  filename: string;
+
+  @Column({ nullable: true })
+  name: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

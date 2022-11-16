@@ -9,13 +9,18 @@ import {
   Put,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
+import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from './dto/page.dto';
+import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
 @ApiTags('board')
@@ -38,7 +43,7 @@ export class BoardController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put()
+  @Put(':id')
   @ApiBearerAuth()
   async updateBoard(
     @Req() req,
@@ -54,13 +59,20 @@ export class BoardController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id/save-pin')
+  @UseInterceptors(FileInterceptor('image'))
   @ApiBearerAuth()
   async savePin(
     @Req() req,
     @Param('id', new ParseIntPipe()) id: number,
-    @Body() pin: any,
+    @UploadedFile() imageFile: Express.Multer.File,
+    @Body() pinDto: AddPinDto,
   ) {
-    return await this.boardService.savePinToBoard(req.user.id, pin, id);
+    return await this.boardService.savePinToBoard(
+      req.user.id,
+      pinDto,
+      id,
+      imageFile,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -79,5 +91,16 @@ export class BoardController {
     @Query() page: PageDto,
   ) {
     return await this.boardService.getPins(id, req.user.id, page);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/remove-pin')
+  @ApiBearerAuth()
+  async removePinFromBoard(
+    @Req() req,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Body() dto: RemovePinDto[],
+  ) {
+    return await this.boardService.removePinsFromBoard(req.user.id, id, dto);
   }
 }
