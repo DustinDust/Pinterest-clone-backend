@@ -14,6 +14,9 @@ export class BaseBoardDto {
 
   @IsNumber()
   @IsIn([1, 0])
-  @ApiProperty()
+  @ApiProperty({
+    enum: [0, 1],
+    description: '0 means private, 1 means public',
+  })
   visibility: number;
 }

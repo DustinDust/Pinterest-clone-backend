@@ -19,8 +19,11 @@ import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
-  ApiBody,
+  ApiConsumes,
+  ApiHeader,
+  ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -36,22 +39,6 @@ export class AuthController {
     private firebaseService: FirebaseService,
   ) {}
 
-  @ApiBody({
-    required: true,
-    schema: {
-      required: ['username', 'password'],
-      properties: {
-        username: {
-          type: 'string',
-          description: 'username',
-        },
-        password: {
-          type: 'string',
-          description: 'password',
-        },
-      },
-    },
-  })
   @ApiOkResponse({
     schema: {
       properties: {
@@ -81,13 +68,20 @@ export class AuthController {
   }
 
   @ApiOkResponse({
-    description: 'OK',
+    description: 'OK - return userId and names',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid or no access-token provided',
   })
   @ApiOperation({
     summary: "Test an user's access token",
     description: 'Require bearer token in header',
   })
-  @ApiBearerAuth()
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Insert Your access token here prepended with "Bearer"',
+  })
+  @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
   @Get('test')
   async testJwt(@Request() req) {
@@ -112,7 +106,15 @@ export class AuthController {
       },
     },
   })
-  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description: 'Invalid or no refreshtoken provided',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description:
+      'insert refresh token into this header field, prepend with "Bearer"',
+  })
+  @ApiBearerAuth('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
@@ -123,10 +125,43 @@ export class AuthController {
     );
   }
 
+  @ApiOkResponse({
+    schema: {
+      properties: {
+        id: {
+          type: 'number',
+        },
+        username: {
+          type: 'string',
+        },
+        displayName: {
+          type: 'string',
+        },
+        avatarUrl: {
+          type: 'string',
+        },
+        createdAt: {
+          type: 'string',
+          format: 'date',
+        },
+        updatedAt: {
+          type: 'string',
+          format: 'date',
+        },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'File upload or user creation has faulted',
+  })
+  @ApiBadRequestResponse({
+    description: 'Username has already been in use',
+  })
   @ApiOperation({
     summary: 'Sign-up a new user',
     description: 'Sign an user app',
   })
+  @ApiConsumes('multipart/form-data')
   @Post('sign-up')
   @UseInterceptors(FileInterceptor('profile-picture'))
   @HttpCode(HttpStatus.OK)
@@ -136,7 +171,7 @@ export class AuthController {
   ) {
     if (dto.avatarUrl) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { hashPassword, hashRefeshToken, ...res } =
+      const { hashPassword, hashRefeshToken, boards, ...res } =
         await this.authService.signUpUser(dto);
       return res;
     } else if (file) {
@@ -144,14 +179,18 @@ export class AuthController {
         const url = await this.firebaseService.uploadFile(file);
         dto.avatarUrl = url;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { hashPassword, hashRefeshToken, ...res } =
+        const { hashPassword, hashRefeshToken, boards, ...res } =
           await this.authService.signUpUser(dto);
         return res;
       } catch (err) {
         throw new InternalServerErrorException(err);
       }
     } else {
-      throw new BadRequestException('Must contain profile picture url');
+      dto.avatarUrl = 'https://i.stack.imgur.com/34AD2.jpg';
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { hashPassword, hashRefeshToken, boards, ...res } =
+        await this.authService.signUpUser(dto);
+      return res;
     }
   }
 }

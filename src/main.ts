@@ -12,11 +12,24 @@ async function bootstrap() {
     .setTitle('Pinterest clone Backend')
     .setDescription('Restful api for pinterest clone BE')
     .setVersion('1.0.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      in: 'header',
-    })
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        in: 'header',
+        bearerFormat: 'JWT',
+      },
+      'access-token',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        in: 'header',
+        bearerFormat: 'JWT',
+      },
+      'refresh-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   app.useGlobalPipes(

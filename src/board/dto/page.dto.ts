@@ -7,13 +7,18 @@ export class PageDto {
   @IsNotEmpty()
   @Min(1)
   @Type(() => Number)
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Index of page you want to fetch. Used in pagination queries',
+  })
   pageNum: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Min(1)
   @Type(() => Number)
-  @ApiProperty()
+  @ApiProperty({
+    description:
+      'Size of the page you want to fetch. Used in pagination queries',
+  })
   pageSize: number;
 }

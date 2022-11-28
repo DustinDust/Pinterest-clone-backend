@@ -1,3 +1,4 @@
+import { ApiResponseProperty } from '@nestjs/swagger';
 import { Pin } from 'src/pin/pin.entity';
 import {
   Column,

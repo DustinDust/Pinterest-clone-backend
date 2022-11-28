@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -35,6 +36,7 @@ export class BoardService {
       board.user = user;
       await this.boardRepository.save(board);
       return {
+        id: board.id,
         ...boardDto,
         user: {
           id: user.id,
@@ -61,7 +63,7 @@ export class BoardService {
       throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'User does not have authority to modify this board',
       );
     }
@@ -110,7 +112,7 @@ export class BoardService {
       throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'User does not have authority to modify this board',
       );
     }
@@ -144,7 +146,7 @@ export class BoardService {
       throw new BadRequestException('Board not found!');
     }
     if (board.user.id !== userId) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'User does not have authority to modify this board',
       );
     }
@@ -164,9 +166,7 @@ export class BoardService {
         },
       },
       select: {
-        user: {
-          id: true,
-        },
+        user: {},
       },
     });
     if (userId !== curUserId) {
@@ -206,7 +206,7 @@ export class BoardService {
         },
       },
       select: {
-        boards: false,
+        boards: {},
       },
       take: page.pageSize,
       skip: page.pageSize * (page.pageNum - 1),
@@ -228,6 +228,7 @@ export class BoardService {
         id: boardId,
       },
       select: {
+        id: true,
         user: {
           id: true,
         },
