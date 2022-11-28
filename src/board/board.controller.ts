@@ -289,6 +289,15 @@ export class BoardController {
       },
     },
   })
+  @ApiUnauthorizedResponse({
+    description: 'invalid access token',
+  })
+  @ApiForbiddenResponse({
+    description: 'User does not own this board',
+  })
+  @ApiBadRequestResponse({
+    description: 'Board with such id does not exist or some invalid json body',
+  })
   @ApiOperation({
     summary: 'remove pins',
     description: 'remove pins from board based on the provided ids in the body',
