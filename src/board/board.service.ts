@@ -241,7 +241,7 @@ export class BoardService {
       throw new BadRequestException('Board does not exist');
     }
     if (board.user.id !== userId) {
-      throw new UnauthorizedException(
+      throw new ForbiddenException(
         'User does not have authority over this board',
       );
     }
