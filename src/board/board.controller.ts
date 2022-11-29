@@ -17,21 +17,15 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
-  getSchemaPath,
   OmitType,
-  PartialType,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
@@ -42,6 +36,7 @@ import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Board } from './board.entity';
 import { Pin } from 'src/pin/pin.entity';
+import { ApiCommon } from 'src/decorators/common-api.docs';
 
 @ApiTags('board')
 @Controller('board')
@@ -60,17 +55,10 @@ export class BoardController {
       },
     },
   })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid JWT token',
-  })
+  @ApiCommon()
   @ApiOperation({
     description: 'Create a new board',
     summary: 'Create board',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -89,23 +77,10 @@ export class BoardController {
       },
     },
   })
-  @ApiBadRequestResponse({
-    description: 'Board does not exist',
-  })
-  @ApiForbiddenResponse({
-    description: 'User does not own this board',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid access token',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: 'delete a board',
     description: 'Delete a board with provided id and authorization token',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @ApiParam({
     name: 'id',
@@ -135,11 +110,6 @@ export class BoardController {
     description: 'update board information',
   })
   @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
-  })
-  @ApiHeader({
     name: 'id',
     description: 'board id',
   })
@@ -158,28 +128,14 @@ export class BoardController {
     );
   }
 
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     type: Board,
   })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid access-token',
-  })
-  @ApiForbiddenResponse({
-    description: 'User does not own this board',
-  })
-  @ApiBadRequestResponse({
-    description:
-      'Invalid json body, perhaps for the board in question can not be found or no url/file was provided',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: 'save pin',
     description:
       'Save a new pin or create a new pin then save it to the board with the provided id',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @ApiParam({
     name: 'id',
@@ -208,18 +164,11 @@ export class BoardController {
   @ApiOkResponse({
     type: [OmitType(Board, ['user', 'pins'])],
   })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid access token',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: 'get all board',
     description:
       'Get all boards of the user with the provided userId. If the user requested match with the one who sent the request, both public and private boards would be returned, otherwise, only the public board is returned',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @ApiParam({
     name: 'id',
@@ -235,17 +184,10 @@ export class BoardController {
   @ApiOkResponse({
     type: [OmitType(Pin, ['boards'])],
   })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid access token',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: 'get pins',
     description: 'Get all pins from the board with the provided id',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @ApiParam({
     name: 'id',
@@ -289,15 +231,7 @@ export class BoardController {
       },
     },
   })
-  @ApiUnauthorizedResponse({
-    description: 'invalid access token',
-  })
-  @ApiForbiddenResponse({
-    description: 'User does not own this board',
-  })
-  @ApiBadRequestResponse({
-    description: 'Board with such id does not exist or some invalid json body',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: 'remove pins',
     description: 'remove pins from board based on the provided ids in the body',
@@ -305,11 +239,6 @@ export class BoardController {
   @ApiParam({
     name: 'id',
     description: 'board id',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Access token, passed with "Bearer"',
-    required: true,
   })
   @UseGuards(JwtAuthGuard)
   @Put(':id/remove-pin')
