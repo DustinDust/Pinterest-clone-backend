@@ -94,6 +94,9 @@ export class BoardService {
       }
     }
     board.pins = [...board.pins, pin];
+    if (!board.thumbnail) {
+      board.thumbnail = pin.url;
+    }
     return await this.boardRepository.save(board);
   }
 
@@ -248,6 +251,11 @@ export class BoardService {
     board.pins = board.pins.filter((p) => {
       return data.findIndex((pin) => p.id === pin.id) < 0;
     });
+    if (board.pins.length <= 0) {
+      board.thumbnail = null;
+    } else {
+      board.thumbnail = board.pins[0].url;
+    }
     for (const datum of data) {
       const pin = await this.pinRepository.findOne({
         relations: { boards: true },

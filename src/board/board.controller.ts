@@ -19,6 +19,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiHeader,
   ApiOkResponse,
@@ -37,24 +38,25 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { Board } from './board.entity';
 import { Pin } from 'src/pin/pin.entity';
 import { ApiCommon } from 'src/decorators/common-api.docs';
+import { CreateBoardInput } from './swagger/input/create-board.input';
+import { CreateBoardOutput } from './swagger/output/create-board.output';
+import { DeleteBoardOutput } from './swagger/output/delete-board.output';
+import { GetAllBoardOutput } from './swagger/output/get-all-board.output';
+import { GetPinsOutput } from './swagger/output/get-pins.output';
+import { RemovePinInput } from './swagger/input/remove-pin-from-board.input';
+import { RemovePinOutput } from './swagger/output/remove-pin-from-board.output';
+import { SavePinOutput } from './swagger/output/save-pin.output';
+import { SavePinInput } from './swagger/input/save-pin.input';
+import { updateBoardInput } from './swagger/input/update-board.input';
+import { UpdateBoardOutput } from './swagger/output/update-board.output';
 
 @ApiTags('board')
 @Controller('board')
 export class BoardController {
   constructor(private boardService: BoardService) {}
 
-  @ApiCreatedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'number' },
-        name: { type: 'string' },
-        description: { type: 'string' },
-        visibility: { type: 'number', description: '0-private; 1-public' },
-        user: { type: 'object', properties: { id: { type: 'number' } } },
-      },
-    },
-  })
+  @ApiCreatedResponse({ type: CreateBoardOutput })
+  @ApiBody({ type: CreateBoardInput })
   @ApiCommon()
   @ApiOperation({
     description: 'Create a new board',
@@ -68,15 +70,7 @@ export class BoardController {
     return await this.boardService.createBoard(req.user.id, boardDto);
   }
 
-  @ApiOkResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        raw: { type: 'string', default: 'any' },
-        affected: { type: 'number', nullable: true },
-      },
-    },
-  })
+  @ApiOkResponse({ type: DeleteBoardOutput })
   @ApiCommon()
   @ApiOperation({
     summary: 'delete a board',
@@ -93,18 +87,8 @@ export class BoardController {
     return await this.boardService.deleteBoard(req.user.id, id);
   }
 
-  @ApiOkResponse({
-    schema: {
-      type: 'object',
-      required: ['id'],
-      properties: {
-        id: { type: 'number', nullable: false },
-        name: { type: 'string', nullable: true },
-        describe: { type: 'string', nullable: true },
-        visibility: { type: 'string', nullable: true },
-      },
-    },
-  })
+  @ApiOkResponse({ type: UpdateBoardOutput })
+  @ApiBody({ type: updateBoardInput })
   @ApiOperation({
     summary: 'update board',
     description: 'update board information',
@@ -128,10 +112,10 @@ export class BoardController {
     );
   }
 
-  @ApiCreatedResponse({
-    type: Board,
-  })
+  @ApiCreatedResponse({ type: SavePinOutput })
+  @ApiBody({ type: SavePinInput })
   @ApiCommon()
+  @ApiConsumes('multipart/form')
   @ApiOperation({
     summary: 'save pin',
     description:
@@ -161,9 +145,7 @@ export class BoardController {
     );
   }
 
-  @ApiOkResponse({
-    type: [OmitType(Board, ['user', 'pins'])],
-  })
+  @ApiOkResponse({ type: [GetAllBoardOutput] })
   @ApiCommon()
   @ApiOperation({
     summary: 'get all board',
@@ -181,9 +163,7 @@ export class BoardController {
     return await this.boardService.getBoardsByUser(req.user.id, id);
   }
 
-  @ApiOkResponse({
-    type: [OmitType(Pin, ['boards'])],
-  })
+  @ApiOkResponse({ type: GetPinsOutput })
   @ApiCommon()
   @ApiOperation({
     summary: 'get pins',
@@ -218,19 +198,8 @@ export class BoardController {
       },
     },
   })
-  @ApiOkResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'integer' },
-        user: { type: 'object', properties: { id: { type: 'integer' } } },
-        pins: {
-          type: 'array',
-          items: { type: 'object', properties: { id: { type: 'integer' } } },
-        },
-      },
-    },
-  })
+  @ApiOkResponse({ type: RemovePinOutput })
+  @ApiBody({ type: [RemovePinInput] })
   @ApiCommon()
   @ApiOperation({
     summary: 'remove pins',

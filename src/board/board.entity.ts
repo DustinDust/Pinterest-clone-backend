@@ -47,4 +47,7 @@ export class Board {
 
   @UpdateDateColumn()
   updateAt: Date;
+
+  @Column({ nullable: true })
+  thumbnail: string;
 }

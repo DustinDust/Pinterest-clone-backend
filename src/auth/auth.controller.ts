@@ -21,6 +21,7 @@ import { FirebaseService } from 'src/firebase/firebase.service';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiConsumes,
   ApiHeader,
   ApiInternalServerErrorResponse,
@@ -30,6 +31,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
+import { SignUpInput } from './swagger/input/sign-up.input';
+import { SignInInput } from './swagger/input/sign-in.input';
+import { ApiCommon } from 'src/decorators/common-api.docs';
+import { SignUpOutput } from './swagger/output/sign-up.output';
+import { SignInOutput } from './swagger/output/sign-in.output';
+import { RefreshOutput } from './swagger/output/refresh.output';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -39,20 +46,8 @@ export class AuthController {
     private firebaseService: FirebaseService,
   ) {}
 
-  @ApiOkResponse({
-    schema: {
-      properties: {
-        accessToken: {
-          type: 'string',
-          description: "user's access token",
-        },
-        refreshToken: {
-          type: 'string',
-          description: "user's refresh token",
-        },
-      },
-    },
-  })
+  @ApiOkResponse({ type: SignInOutput })
+  @ApiBody({ type: SignInInput })
   @ApiUnauthorizedResponse({
     description: 'Failed to sign user in with that credentials',
   })
@@ -67,19 +62,10 @@ export class AuthController {
     return await this.authService.signInUser(req.user.id, req.user.username);
   }
 
-  @ApiOkResponse({
-    description: 'OK - return userId and names',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid or no access-token provided',
-  })
+  @ApiCommon()
   @ApiOperation({
     summary: "Test an user's access token",
     description: 'Require bearer token in header',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Insert Your access token here prepended with "Bearer"',
   })
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard)
@@ -92,28 +78,8 @@ export class AuthController {
     summary: 'Refresh a token',
     description: 'Refresh access token to get a new token',
   })
-  @ApiOkResponse({
-    schema: {
-      properties: {
-        accessToken: {
-          type: 'string',
-          description: 'new access token',
-        },
-        refreshToken: {
-          type: 'string',
-          description: 'refresh token',
-        },
-      },
-    },
-  })
-  @ApiUnauthorizedResponse({
-    description: 'Invalid or no refreshtoken provided',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description:
-      'insert refresh token into this header field, prepend with "Bearer"',
-  })
+  @ApiOkResponse({ type: RefreshOutput })
+  @ApiCommon()
   @ApiBearerAuth('refresh-token')
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
@@ -125,32 +91,8 @@ export class AuthController {
     );
   }
 
-  @ApiOkResponse({
-    schema: {
-      properties: {
-        id: {
-          type: 'number',
-        },
-        username: {
-          type: 'string',
-        },
-        displayName: {
-          type: 'string',
-        },
-        avatarUrl: {
-          type: 'string',
-        },
-        createdAt: {
-          type: 'string',
-          format: 'date',
-        },
-        updatedAt: {
-          type: 'string',
-          format: 'date',
-        },
-      },
-    },
-  })
+  @ApiOkResponse({ type: SignUpOutput })
+  @ApiBody({ type: SignUpInput })
   @ApiInternalServerErrorResponse({
     description: 'File upload or user creation has faulted',
   })
