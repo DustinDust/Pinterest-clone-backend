@@ -7,6 +7,7 @@ import { FirebaseModule } from './firebase/firebase.module';
 import { BoardModule } from './board/board.module';
 import { PinModule } from './pin/pin.module';
 import { PaginationModule } from './pagination/pagination.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { PaginationModule } from './pagination/pagination.module';
     FirebaseModule,
     BoardModule,
     PinModule,
+    TagModule,
     PaginationModule,
   ],
   controllers: [],
