@@ -5,7 +5,12 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { PinService } from './pin.service';
@@ -23,6 +28,7 @@ export class PinController {
     type: 'integer',
     required: true,
   })
+  @ApiBearerAuth('access-token')
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async getPin(@Param('id', new ParseIntPipe()) id: number) {
