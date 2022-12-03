@@ -158,25 +158,34 @@ export class BoardService {
     });
   }
 
-  async getBoardsByUser(curUserId: number, userId: number) {
-    const boards = await this.boardRepository.find({
-      relations: {
-        user: true,
-      },
-      where: {
-        user: {
-          id: userId,
+  async getBoardsByUser(curUserId: number, userId: number, page: PageDto) {
+    if (curUserId === userId) {
+      const [boards, count] = await this.boardRepository.findAndCount({
+        relations: {
+          user: true,
         },
-      },
-      select: {
-        user: {},
-      },
-    });
-    if (userId !== curUserId) {
-      const res = boards.filter((b) => b.visibility === Visibility.PUBLIC);
-      return res;
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+        select: {
+          user: {},
+        },
+        take: page.pageSize,
+        skip: page.pageSize * (page.pageNum - 1),
+      });
+      return { boards, count };
+    } else {
+      const [boards, count] = await this.boardRepository.findAndCount({
+        relations: { user: true },
+        where: { user: { id: userId }, visibility: Visibility.PUBLIC },
+        select: { user: {} },
+        take: page.pageSize,
+        skip: page.pageSize * (page.pageNum - 1),
+      });
+      return { boards, count };
     }
-    return boards;
   }
 
   async getPins(boardId: number, userId: number, page: PageDto) {
@@ -199,7 +208,7 @@ export class BoardService {
         );
       }
     }
-    const boardPins = await this.pinRepository.find({
+    const [boardPins, count] = await this.pinRepository.findAndCount({
       relations: {
         boards: true,
       },
@@ -214,7 +223,16 @@ export class BoardService {
       take: page.pageSize,
       skip: page.pageSize * (page.pageNum - 1),
     });
-    return boardPins;
+    return {
+      data: {
+        id: board.id,
+        description: board.description,
+        name: board.name,
+        visibility: board.visibility,
+        pins: boardPins,
+      },
+      count,
+    };
   }
 
   async removePinsFromBoard(
