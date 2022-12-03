@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { BoardModule } from './board/board.module';
 import { PinModule } from './pin/pin.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PinModule } from './pin/pin.module';
     FirebaseModule,
     BoardModule,
     PinModule,
+    TagModule,
   ],
   controllers: [],
   providers: [],
