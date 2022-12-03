@@ -26,7 +26,6 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  PartialType,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
