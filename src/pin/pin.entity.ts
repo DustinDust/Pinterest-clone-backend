@@ -1,5 +1,6 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 import { Board } from 'src/board/board.entity';
+import { Tag } from 'src/tag/entities/tag.entity';
 import {
   Column,
   CreateDateColumn,
@@ -15,6 +16,9 @@ export class Pin {
 
   @ManyToMany(() => Board, (board) => board.pins)
   boards: Board[];
+
+  @ManyToMany(() => Tag, (tag) => tag.pins)
+  tags: Tag[];
 
   @Column({ nullable: false })
   url: string;
