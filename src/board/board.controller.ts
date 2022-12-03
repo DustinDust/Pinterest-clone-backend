@@ -26,7 +26,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  OmitType,
+  PartialType,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
@@ -35,8 +35,6 @@ import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from './dto/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
-import { Board } from './board.entity';
-import { Pin } from 'src/pin/pin.entity';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { CreateBoardInput } from './swagger/input/create-board.input';
 import { CreateBoardOutput } from './swagger/output/create-board.output';
@@ -49,11 +47,16 @@ import { SavePinOutput } from './swagger/output/save-pin.output';
 import { SavePinInput } from './swagger/input/save-pin.input';
 import { updateBoardInput } from './swagger/input/update-board.input';
 import { UpdateBoardOutput } from './swagger/output/update-board.output';
+import { PaginationService } from 'src/pagination/pagination.service';
+import { ApiOkResponsePaginated } from 'src/pagination/pagination.output';
 
 @ApiTags('board')
 @Controller('board')
 export class BoardController {
-  constructor(private boardService: BoardService) {}
+  constructor(
+    private boardService: BoardService,
+    private pagination: PaginationService,
+  ) {}
 
   @ApiCreatedResponse({ type: CreateBoardOutput })
   @ApiBody({ type: CreateBoardInput })
@@ -145,7 +148,7 @@ export class BoardController {
     );
   }
 
-  @ApiOkResponse({ type: [GetAllBoardOutput] })
+  @ApiOkResponsePaginated(GetAllBoardOutput, true)
   @ApiCommon()
   @ApiOperation({
     summary: 'get all board',
@@ -159,11 +162,16 @@ export class BoardController {
   @UseGuards(JwtAuthGuard)
   @Get('user/:id')
   @ApiBearerAuth('access-token')
-  async getAllBoard(@Req() req, @Param('id', new ParseIntPipe()) id: number) {
-    return await this.boardService.getBoardsByUser(req.user.id, id);
+  async getAllBoard(
+    @Req() req,
+    @Param('id', new ParseIntPipe()) id: number,
+    @Query() page: PageDto,
+  ) {
+    const data = await this.boardService.getBoardsByUser(req.user.id, id, page);
+    return this.pagination.makePaginatedResponse(page, data.boards, data.count);
   }
 
-  @ApiOkResponse({ type: GetPinsOutput })
+  @ApiOkResponsePaginated(GetPinsOutput, false)
   @ApiCommon()
   @ApiOperation({
     summary: 'get pins',
@@ -181,23 +189,10 @@ export class BoardController {
     @Param('id', new ParseIntPipe()) id: number,
     @Query() page: PageDto,
   ) {
-    return await this.boardService.getPins(id, req.user.id, page);
+    const data = await this.boardService.getPins(id, req.user.id, page);
+    return this.pagination.makePaginatedResponse(page, data.data, data.count);
   }
 
-  @ApiBody({
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: {
-            type: 'integer',
-            description: 'id of the pins you want to remove',
-          },
-        },
-      },
-    },
-  })
   @ApiOkResponse({ type: RemovePinOutput })
   @ApiBody({ type: [RemovePinInput] })
   @ApiCommon()
