@@ -31,7 +31,7 @@ import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
 import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
-import { PageDto } from './dto/page.dto';
+import { PageDto } from '../pagination/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { ApiCommon } from 'src/decorators/common-api.docs';

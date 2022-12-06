@@ -12,7 +12,7 @@ import { Repository } from 'typeorm';
 import { Board, Visibility } from './board.entity';
 import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
-import { PageDto } from './dto/page.dto';
+import { PageDto } from '../pagination/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
