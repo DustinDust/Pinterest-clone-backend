@@ -16,11 +16,26 @@ export class FirebaseService {
     this.bucket = getStorage(app).bucket();
   }
 
-  async uploadFile(file: Express.Multer.File) {
-    const bucketFile = this.bucket.file(file.originalname);
+  async uploadFile(file: Express.Multer.File, filename: string, path = '') {
+    const bucketFile = this.bucket.file(`${path}/${filename}`);
     await bucketFile.save(file.buffer, {
       public: true,
       metadata: { contentType: file.mimetype },
+    });
+    console.log(`file is available at ${bucketFile.publicUrl()}`);
+    return bucketFile.publicUrl();
+  }
+
+  async uploadFromBuffer(
+    file: Buffer,
+    filename: string,
+    path = '',
+    metadata: any,
+  ) {
+    const bucketFile = this.bucket.file(`${path}/${filename}`);
+    await bucketFile.save(file, {
+      public: true,
+      metadata: metadata,
     });
     console.log(`file is available at ${bucketFile.publicUrl()}`);
     return bucketFile.publicUrl();

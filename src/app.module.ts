@@ -8,6 +8,7 @@ import { BoardModule } from './board/board.module';
 import { PinModule } from './pin/pin.module';
 import { PaginationModule } from './pagination/pagination.module';
 import { TagModule } from './tag/tag.module';
+import { ThumbnailModule } from './thumbnail/thumbnail.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TagModule } from './tag/tag.module';
     PinModule,
     TagModule,
     PaginationModule,
+    ThumbnailModule,
   ],
   controllers: [],
   providers: [],

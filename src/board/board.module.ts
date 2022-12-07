@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Pin } from 'src/pin/pin.entity';
 import { User } from 'src/user/user.entity';
 import { Board } from './board.entity';
-
 @Module({
   imports: [TypeOrmModule.forFeature([Pin, User, Board])],
   providers: [BoardService],

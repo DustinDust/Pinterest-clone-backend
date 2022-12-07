@@ -15,6 +15,8 @@ import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from '../pagination/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { ThumbnailService } from 'src/thumbnail/thumbnail.service';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class BoardService {
@@ -22,6 +24,7 @@ export class BoardService {
     @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(User) private userRepsitory: Repository<User>,
     @InjectRepository(Pin) private pinRepository: Repository<Pin>,
+    private thumbnailService: ThumbnailService,
     private firebaseService: FirebaseService,
   ) {}
 
@@ -74,18 +77,39 @@ export class BoardService {
         );
       }
       pin = this.pinRepository.create();
+      pin.fileuuid = randomUUID();
       let url: string;
+      let thumbnailUrl: string;
+      let thumbtry: {
+        thumbnail?: Buffer;
+        err?: any;
+        ext?: string;
+        mime?: string;
+      };
       if (pinDto.url) {
         url = pinDto.url;
+        thumbtry = await this.thumbnailService.createFromUrl(pinDto.url);
       } else {
-        url = await this.firebaseService.uploadFile(image);
-        pin.url = url;
-        pin.filename = image.originalname;
+        url = await this.firebaseService.uploadFile(image, pin.fileuuid);
+        thumbtry = await this.thumbnailService.createFromBuffer(image.buffer);
       }
       if (!pinDto.name) {
         throw new BadRequestException('Pin must have a name.');
       }
+      if (thumbtry.err) {
+        console.log(thumbtry.err);
+        thumbnailUrl = url;
+      } else {
+        thumbnailUrl = await this.firebaseService.uploadFromBuffer(
+          thumbtry.thumbnail,
+          `${pin.fileuuid}-thumbnail`,
+          'thumbnail',
+          { contentType: thumbtry.mime },
+        );
+      }
       pin.name = pinDto.name;
+      pin.url = url;
+      pin.thumbnail = thumbnailUrl;
       await this.pinRepository.save(pin);
     } else {
       pin = await this.pinRepository.findOneBy({ id: pinDto.id });
@@ -95,7 +119,7 @@ export class BoardService {
     }
     board.pins = [...board.pins, pin];
     if (!board.thumbnail) {
-      board.thumbnail = pin.url;
+      board.thumbnail = pin.thumbnail;
     }
     return await this.boardRepository.save(board);
   }
@@ -280,8 +304,9 @@ export class BoardService {
         where: { id: datum.id },
       });
       if (pin.boards.length === 0) {
-        if (pin.filename) {
-          this.firebaseService.removeFile(pin.filename);
+        if (pin.fileuuid) {
+          this.firebaseService.removeFile(`/${pin.fileuuid}`);
+          this.firebaseService.removeFile(`thumbnail/${pin.fileuuid}`);
         }
       }
     }

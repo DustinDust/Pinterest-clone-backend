@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -23,7 +22,6 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
-  ApiHeader,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
@@ -117,8 +115,13 @@ export class AuthController {
         await this.authService.signUpUser(dto);
       return res;
     } else if (file) {
+      console.log(file);
       try {
-        const url = await this.firebaseService.uploadFile(file);
+        const url = await this.firebaseService.uploadFile(
+          file,
+          dto.username,
+          'userpfp',
+        );
         dto.avatarUrl = url;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { hashPassword, hashRefeshToken, boards, ...res } =
