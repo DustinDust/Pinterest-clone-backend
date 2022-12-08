@@ -1,4 +1,3 @@
-import { ApiResponseProperty } from '@nestjs/swagger';
 import { Board } from 'src/board/board.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
 import {
@@ -23,10 +22,13 @@ export class Pin {
   @Column({ nullable: false })
   url: string;
 
-  @Column({ nullable: true })
-  filename: string;
+  @Column({ nullable: false })
+  thumbnail: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: false })
+  fileuuid: string;
+
+  @Column({ nullable: false })
   name: string;
 
   @CreateDateColumn()
