@@ -45,6 +45,7 @@ export class AuthService {
       throw new InternalServerErrorException(res.raw);
     }
     return {
+      id,
       accessToken,
       refreshToken,
     };
