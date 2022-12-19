@@ -48,6 +48,7 @@ import { updateBoardInput } from './swagger/input/update-board.input';
 import { UpdateBoardOutput } from './swagger/output/update-board.output';
 import { PaginationService } from 'src/pagination/pagination.service';
 import { ApiOkResponsePaginated } from 'src/pagination/pagination.output';
+import { AddPinWithTagDto } from './dto/add-tag.dto';
 
 @ApiTags('board')
 @Controller('board')
@@ -121,7 +122,7 @@ export class BoardController {
   @ApiOperation({
     summary: 'save pin',
     description:
-      'Save a new pin or create a new pin then save it to the board with the provided id',
+      'Save a new pin or create a new pin then save it to the board with the provided id during saving or add tag with a pin',
   })
   @ApiParam({
     name: 'id',
@@ -137,11 +138,11 @@ export class BoardController {
     @Req() req,
     @Param('id', new ParseIntPipe()) id: number,
     @UploadedFile() imageFile: Express.Multer.File,
-    @Body() pinDto: AddPinDto,
+    @Body() pinTagDto: AddPinWithTagDto,
   ) {
     return await this.boardService.savePinToBoard(
       req.user.id,
-      pinDto,
+      pinTagDto,
       id,
       imageFile,
     );
