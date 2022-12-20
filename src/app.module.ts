@@ -9,6 +9,7 @@ import { PinModule } from './pin/pin.module';
 import { PaginationModule } from './pagination/pagination.module';
 import { TagModule } from './tag/tag.module';
 import { ThumbnailModule } from './thumbnail/thumbnail.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ThumbnailModule } from './thumbnail/thumbnail.module';
     TagModule,
     PaginationModule,
     ThumbnailModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [],
