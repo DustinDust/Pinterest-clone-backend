@@ -6,5 +6,7 @@ export class UpdateTagOutput {
   @ApiResponseProperty()
   name: string;
   @ApiResponseProperty()
+  createdAt: Date;
+  @ApiResponseProperty()
   updateAt: Date;
 }

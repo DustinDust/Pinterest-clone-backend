@@ -1,16 +1,15 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { Visibility } from 'src/board/board.entity';
 
-export class GetPinOutput {
+export class SaveTagOutput {
   @ApiResponseProperty()
   id: number;
   @ApiResponseProperty()
-  filename: string;
+  url: string;
+  @ApiResponseProperty()
+  fileuuid: string;
   @ApiResponseProperty()
   name: string;
-  @ApiResponseProperty()
-  createdAt: Date;
-  @ApiResponseProperty()
-  url: string;
   @ApiProperty({
     type: 'array',
     items: {
@@ -18,16 +17,16 @@ export class GetPinOutput {
       required: ['id'],
       properties: {
         id: { type: 'integer' },
-        name: { type: 'string' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' },
       },
     },
   })
   tags: {
     id: number;
-    name: string;
-    createdAt: Date;
-    updatedAt: Date;
   }[];
+  @ApiResponseProperty()
+  createdAt: Date;
+  @ApiResponseProperty()
+  updateAt: Date;
+  @ApiResponseProperty()
+  thumbnail: string;
 }

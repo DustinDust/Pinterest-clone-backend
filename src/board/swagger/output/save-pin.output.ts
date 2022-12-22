@@ -41,6 +41,19 @@ export class SavePinOutput {
     name: string;
     createdAt: Date;
   }[];
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: { type: 'integer' },
+      },
+    },
+  })
+  tags: {
+    id: number;
+  }[];
   @ApiResponseProperty()
   createdAt: Date;
   @ApiResponseProperty()
