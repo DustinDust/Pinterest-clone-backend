@@ -31,11 +31,14 @@ export class SearchService {
       relations: { pins: true },
       where:{name: Like("%" + nameSearch.name + "%")},
     });
-    let arrPins = [];
+    let arrPinsAll = [];
     let sz = (await tags).length;
     for(let i = 0; i < sz; i++){
-      arrPins = this.arrayUnique(arrPins.concat((await tags)[i].pins))
+      arrPinsAll= this.arrayUnique(arrPinsAll.concat((await tags)[i].pins))
     }
-    return arrPins;
+    let count = arrPinsAll.length;
+    let startIndex = nameSearch.pageSize * (nameSearch.pageNum - 1)
+    let arrPins = arrPinsAll.slice(startIndex, startIndex+nameSearch.pageSize);
+    return {data: arrPins, count};
   }
 }

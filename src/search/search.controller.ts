@@ -6,11 +6,16 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiProp
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { GetPinsFromNameTagOutput } from './swagger/output/get-pins-from-name-tag.output';
+import { PageDto } from 'src/pagination/page.dto';
+import { PaginationService } from 'src/pagination/pagination.service';
 
 @ApiTags('search')
 @Controller('search')
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    private searchService: SearchService,
+    private pagination: PaginationService,
+  ) {}
 
   @ApiCreatedResponse({type: GetPinsFromNameTagOutput, isArray: true})
   @ApiCommon()
@@ -19,13 +24,18 @@ export class SearchController {
     description: 'Get pins when query by name tag',
   })
   @ApiQuery({
-    name: 'name',
-    description: 'name of tag',
+    name: 'name & pageNum & pageSize',
+    description: 'name of tag and pagination',
   })
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiBearerAuth('access-token')
-  findPinWithTag(@Query() name: CreateSearchDto) {
-    return this.searchService.findPinWithTag(name);
+  async findPinWithTag(@Query() nameAndPage: CreateSearchDto) {
+    const data = await this.searchService.findPinWithTag(nameAndPage);
+    let page = {
+      pageNum: nameAndPage.pageNum,
+      pageSize: nameAndPage.pageSize,
+    }
+    return this.pagination.makePaginatedResponse(page, data.data, data.count);
   }
 }

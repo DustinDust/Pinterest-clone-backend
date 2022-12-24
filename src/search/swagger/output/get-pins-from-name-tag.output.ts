@@ -3,15 +3,31 @@ import { Visibility } from 'src/board/board.entity';
 
 export class GetPinsFromNameTagOutput {
   @ApiResponseProperty()
-  id: number;
+  pageIndex: number;
   @ApiResponseProperty()
-  url: string;
+  pageSize: number;
   @ApiResponseProperty()
-  thumbnail: string;
-  @ApiResponseProperty()
-  fileuuid: string;
-  @ApiResponseProperty()
-  name: string;
-  @ApiResponseProperty()
-  createdAt: Date;
+  total: number;
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        id: { type: 'integer' },
+        url: { type: 'string' },
+        thumbnail: { type: 'string' },
+        fileuuid: { type: 'string' },
+        name: { type: 'string' },
+        createdAt: { type: 'string', format: 'date-time' },
+      },
+    },
+  })
+  data: {
+    id: number;
+    url: string;
+    thumbnail: string;
+    fileuuid: string;
+    name: string;
+    createdAt: Date;
+  }[];
 }
