@@ -1,12 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiProperty, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { GetPinsFromNameTagOutput } from './swagger/output/get-pins-from-name-tag.output';
-import { PageDto } from 'src/pagination/page.dto';
 import { PaginationService } from 'src/pagination/pagination.service';
 
 @ApiTags('search')
@@ -17,7 +21,7 @@ export class SearchController {
     private pagination: PaginationService,
   ) {}
 
-  @ApiCreatedResponse({type: GetPinsFromNameTagOutput, isArray: true})
+  @ApiCreatedResponse({ type: GetPinsFromNameTagOutput, isArray: true })
   @ApiCommon()
   @ApiOperation({
     summary: 'get pins',
@@ -32,10 +36,10 @@ export class SearchController {
   @ApiBearerAuth('access-token')
   async findPinWithTag(@Query() nameAndPage: CreateSearchDto) {
     const data = await this.searchService.findPinWithTag(nameAndPage);
-    let page = {
+    const page = {
       pageNum: nameAndPage.pageNum,
       pageSize: nameAndPage.pageSize,
-    }
+    };
     return this.pagination.makePaginatedResponse(page, data.data, data.count);
   }
 }

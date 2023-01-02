@@ -18,7 +18,7 @@ export class PinService {
 
   async getPin(id: number) {
     return await this.pinRepository.findOne({
-      relations: {tags: true },
+      relations: { tags: true },
       where: { id: id },
     });
   }
@@ -59,10 +59,7 @@ export class PinService {
     };
   }
 
-  async saveTagToPin(
-    tagDto: CreateTagDto,
-    pinId: number,
-  ) {
+  async saveTagToPin(tagDto: CreateTagDto, pinId: number) {
     console.log(tagDto);
     let tag: Tag;
     const pin = await this.pinRepository.findOne({
@@ -81,7 +78,7 @@ export class PinService {
       tag.name = tagDto.name;
       await this.tagRepository.save(tag);
     } else {
-      tag = await this.tagRepository.findOneBy({id: tagDto.id})
+      tag = await this.tagRepository.findOneBy({ id: tagDto.id });
       if (!tag) {
         throw new BadRequestException('Tag does not exist.');
       }
@@ -90,10 +87,7 @@ export class PinService {
     return await this.pinRepository.save(pin);
   }
 
-  async removeTagFromPin(
-    pinId: number,
-    data: RemoveTagDto[],
-  ) {
+  async removeTagFromPin(pinId: number, data: RemoveTagDto[]) {
     const pin = await this.pinRepository.findOne({
       relations: {
         tags: true,

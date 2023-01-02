@@ -1,4 +1,4 @@
-import { Pin } from "src/pin/pin.entity";
+import { Pin } from 'src/pin/pin.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,8 +6,8 @@ import {
   JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Tag {

@@ -1,9 +1,28 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, HttpStatus, Req, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+  Put,
+} from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { JwtAuthGuard } from 'src/auth/guards';
-import { ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { CreateTagOutput } from './swagger/output/create-tag.output';
 import { CreateTagInput } from './swagger/input/create-tag.input';
@@ -33,12 +52,11 @@ export class TagController {
     return await this.tagService.create(createTagDto);
   }
 
-  @ApiOkResponse({type: GetAllTagOutput, isArray: true})
+  @ApiOkResponse({ type: GetAllTagOutput, isArray: true })
   @ApiCommon()
   @ApiOperation({
     summary: 'get all tags',
-    description:
-      'Get all tags ',
+    description: 'Get all tags ',
   })
   @UseGuards(JwtAuthGuard)
   @Get()
