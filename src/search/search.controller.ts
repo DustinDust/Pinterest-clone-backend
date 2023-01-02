@@ -21,15 +21,11 @@ export class SearchController {
     private pagination: PaginationService,
   ) {}
 
-  @ApiCreatedResponse({ type: GetPinsFromNameTagOutput, isArray: true })
+  @ApiCreatedResponse({ type: GetPinsFromNameTagOutput })
   @ApiCommon()
   @ApiOperation({
     summary: 'get pins',
     description: 'Get pins when query by name tag',
-  })
-  @ApiQuery({
-    name: 'name & pageNum & pageSize',
-    description: 'name of tag and pagination',
   })
   @UseGuards(JwtAuthGuard)
   @Get()
