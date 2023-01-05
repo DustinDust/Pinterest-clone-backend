@@ -1,12 +1,24 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+  Matches,
+} from 'class-validator';
 
 export class SignUpDto {
   @IsNotEmpty()
   @IsString()
+  @Matches(/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/, {
+    message:
+      "Username can only alphanumeric string, undescore and dot. Underscore and dot can't  be at the start/end of the username, and can't be used multiple times in a row, or next to each other. Username must be between 8-20 characters length",
+  })
   username: string;
 
   @IsNotEmpty()
   @IsString()
+  @Length(6, 20)
   password: string;
 
   @IsNotEmpty()

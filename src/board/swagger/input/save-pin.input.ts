@@ -33,8 +33,7 @@ export class SavePinInput {
 
   @ApiProperty({
     required: false,
-    description:
-      'Only provided when add tags with pin',
+    description: 'Only provided when add tags with pin',
   })
   idTags?: number[];
 }

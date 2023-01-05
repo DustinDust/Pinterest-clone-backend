@@ -35,6 +35,7 @@ import { ApiCommon } from 'src/decorators/common-api.docs';
 import { SignUpOutput } from './swagger/output/sign-up.output';
 import { SignInOutput } from './swagger/output/sign-in.output';
 import { RefreshOutput } from './swagger/output/refresh.output';
+import { randomUUID } from 'crypto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -115,11 +116,11 @@ export class AuthController {
         await this.authService.signUpUser(dto);
       return res;
     } else if (file) {
-      console.log(file);
+      // console.log(file);
       try {
         const url = await this.firebaseService.uploadFile(
           file,
-          dto.username,
+          `${dto.username}-${randomUUID()}`,
           'userpfp',
         );
         dto.avatarUrl = url;
