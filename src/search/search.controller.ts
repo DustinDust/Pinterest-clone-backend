@@ -3,9 +3,8 @@ import { SearchService } from './search.service';
 import { CreateSearchDto } from './dto/create-search.dto';
 import {
   ApiBearerAuth,
-  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
@@ -21,7 +20,7 @@ export class SearchController {
     private pagination: PaginationService,
   ) {}
 
-  @ApiCreatedResponse({ type: GetPinsFromNameTagOutput })
+  @ApiOkResponse({ type: GetPinsFromNameTagOutput })
   @ApiCommon()
   @ApiOperation({
     summary: 'get pins',

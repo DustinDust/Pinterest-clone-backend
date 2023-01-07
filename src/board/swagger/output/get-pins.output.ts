@@ -9,7 +9,7 @@ export class GetPinsOutput {
   @ApiResponseProperty()
   description: string;
   @ApiResponseProperty()
-  visibilit: Visibility;
+  visibility: Visibility;
   @ApiProperty({
     type: 'array',
     items: {

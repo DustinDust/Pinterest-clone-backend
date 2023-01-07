@@ -32,6 +32,8 @@ import { RemoveTagOutput } from './swagger/output/remove-tag-from-pin.output';
 import { RemoveTagInput } from './swagger/input/remove-tag-from-pin.input';
 import { SaveTagOutput } from './swagger/output/save-tag.output';
 import { SaveTagInput } from './swagger/input/save-tag.input';
+import { GetBoardsAndUserFromPin } from './swagger/output/get-pin-boards.output';
+import { ApiOkResponsePaginated } from 'src/pagination/pagination.output';
 
 @ApiTags('pin')
 @Controller('pin')
@@ -57,6 +59,13 @@ export class PinController {
 
   @ApiBearerAuth()
   @Get(':id/boards')
+  @ApiParam({
+    name: 'id',
+    type: 'number',
+    description:
+      'id of the pin you want to fetch users & boards that save this pin',
+  })
+  @ApiOkResponsePaginated(GetBoardsAndUserFromPin, true)
   @ApiCommon()
   @UseGuards(JwtAuthGuard)
   async getBoards(
@@ -92,10 +101,7 @@ export class PinController {
     @Param('id', new ParseIntPipe()) id: number,
     @Body() tagDto: CreateTagDto,
   ) {
-    return await this.pinService.saveTagToPin(
-      tagDto,
-      id,
-    );
+    return await this.pinService.saveTagToPin(tagDto, id);
   }
 
   @ApiOkResponse({ type: RemoveTagOutput })
