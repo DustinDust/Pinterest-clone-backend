@@ -29,7 +29,6 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { BoardService } from './board.service';
-import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from '../pagination/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
