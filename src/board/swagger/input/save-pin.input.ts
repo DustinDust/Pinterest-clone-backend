@@ -33,7 +33,22 @@ export class SavePinInput {
 
   @ApiProperty({
     required: false,
-    description: 'Only provided when add tags with pin',
+    description:
+      'Only provided if you want to add exisiting tags when saving pin',
+    type: 'array',
+    items: {
+      type: 'number',
+    },
   })
-  idTags?: number[];
+  tagIds: number[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Only provided if you want to add new tags when saving pin',
+    type: 'array',
+    items: {
+      type: 'string',
+    },
+  })
+  tagNames: string[];
 }

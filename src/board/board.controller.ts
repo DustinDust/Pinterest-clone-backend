@@ -139,6 +139,7 @@ export class BoardController {
     @UploadedFile() imageFile: Express.Multer.File,
     @Body() pinTagDto: AddPinWithTagDto,
   ) {
+    console.log(pinTagDto);
     return await this.boardService.savePinToBoard(
       req.user.id,
       pinTagDto,

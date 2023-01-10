@@ -10,7 +10,6 @@ import { Pin } from 'src/pin/pin.entity';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { Board, Visibility } from './board.entity';
-import { AddPinDto } from './dto/add-pin.dto';
 import { BaseBoardDto } from './dto/base-board.dto';
 import { PageDto } from '../pagination/page.dto';
 import { RemovePinDto } from './dto/remove-pin.dto';
@@ -73,15 +72,32 @@ export class BoardService {
         'User does not have authority to modify this board',
       );
     }
-    let tags = [];
-    if(pinTagDto.idTags !== undefined){
-      for( let i = 0; i < pinTagDto.idTags.length; i++){
-        let tag: Tag;
-        tag = await this.tagRepository.findOneBy({id: Number(pinTagDto.idTags[i])});
+    const tags = [];
+    if (pinTagDto.tagIds !== undefined && pinTagDto.tagIds.length > 0) {
+      for (const tagId of pinTagDto.tagIds) {
+        try {
+          const tagIdNum = Number(tagId);
+          const tag = await this.tagRepository.findOneBy({ id: tagIdNum });
+          tags.push(tag);
+        } catch (err) {
+          continue;
+        }
+      }
+    }
+    if (pinTagDto.tagNames !== undefined && pinTagDto.tagNames.length > 0) {
+      if (Array.isArray(pinTagDto.tagNames)) {
+        for (const tagName of pinTagDto.tagNames) {
+          const tag = this.tagRepository.create();
+          tag.name = tagName;
+          await this.tagRepository.save(tag);
+          tags.push(tag);
+        }
+      } else {
+        const tag = this.tagRepository.create();
+        tag.name = pinTagDto.tagNames;
+        await this.tagRepository.save(tag);
         tags.push(tag);
       }
-    }else{
-      console.log("Do not have any tags!");
     }
     if (!pinTagDto.id) {
       if (!image && !pinTagDto.url) {
@@ -102,7 +118,8 @@ export class BoardService {
       if (pinTagDto.url) {
         url = pinTagDto.url;
         thumbtry = await this.thumbnailService.createFromUrl(pinTagDto.url);
-      } else {pinTagDto
+      } else {
+        pinTagDto;
         url = await this.firebaseService.uploadFile(image, pin.fileuuid);
         thumbtry = await this.thumbnailService.createFromBuffer(image.buffer);
       }
@@ -127,7 +144,7 @@ export class BoardService {
       await this.pinRepository.save(pin);
     } else {
       pin = await this.pinRepository.findOne({
-        relations: {tags: true },
+        relations: { tags: true },
         where: { id: pinTagDto.id },
         select: { tags: { id: true } },
       });

@@ -1,7 +1,7 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, Min } from "class-validator";
-import { PageDto } from "src/pagination/page.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { PageDto } from 'src/pagination/page.dto';
 
 export class CreateSearchDto {
   name: string;

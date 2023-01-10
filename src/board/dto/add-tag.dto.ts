@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, IsUrl, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Min,
+} from 'class-validator';
 
 export class AddPinWithTagDto {
   @ApiProperty({
@@ -32,5 +39,9 @@ export class AddPinWithTagDto {
   @IsOptional()
   name?: string;
 
-  idTags?: number[];
+  @IsOptional()
+  tagIds: number[];
+
+  @IsOptional()
+  tagNames: string[];
 }

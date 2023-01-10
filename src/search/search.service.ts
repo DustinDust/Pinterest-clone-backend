@@ -26,6 +26,13 @@ export class SearchService {
   }
 
   async findPinWithTag(nameSearch: CreateSearchDto) {
+    if (!nameSearch.name || nameSearch.name.length <= 0) {
+      const [pins, count] = await this.pinRepository.findAndCount({
+        skip: nameSearch.pageSize * (nameSearch.pageNum - 1),
+        take: nameSearch.pageSize,
+      });
+      return { data: pins, count };
+    }
     const tags = this.tagRepository.find({
       relations: { pins: true },
       where: { name: Like('%' + nameSearch.name + '%') },
