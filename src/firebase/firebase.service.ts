@@ -8,6 +8,7 @@ import { getStorage } from 'firebase-admin/storage';
 @Injectable()
 export class FirebaseService {
   bucket: Bucket;
+
   constructor(configService: ConfigService) {
     const app = firebase.initializeApp({
       credential: applicationDefault(),

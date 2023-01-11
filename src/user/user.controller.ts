@@ -31,6 +31,10 @@ import { FirebaseService } from 'src/firebase/firebase.service';
 import { UpdateUserInput } from './swagger/input/update-user.input';
 import { randomUUID } from 'crypto';
 import { UpdateUserOutput } from './swagger/output/update-user.output';
+import { UnfollowOutput } from './swagger/output/unfollow.output';
+import { FollowOutput } from './swagger/output/follow.output';
+import { GetFollowersOutput } from './swagger/output/get-followers.output';
+import { GetFollowingOutput } from './swagger/output/get-following.output';
 
 @ApiTags('user')
 @Controller('user')
@@ -103,5 +107,73 @@ export class UserController {
         await this.userService.updateUserInfo(req.user.id, dto);
       return res;
     }
+  }
+
+  @ApiCommon()
+  @ApiOkResponse({ type: GetFollowersOutput })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the user whose followers you want to fetch',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/followers')
+  async getFollowers(@Req() req, @Param('id', new ParseIntPipe()) id: number) {
+    return await this.userService.getFollowers(id);
+  }
+
+  @ApiCommon()
+  @ApiOkResponse({ type: GetFollowingOutput })
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the user whose following you want to fetch',
+  })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/following')
+  async getFollowing(@Req() req, @Param('id', new ParseIntPipe()) id: number) {
+    return await this.userService.getFollowing(id);
+  }
+
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the user that the current user want to follow',
+  })
+  @ApiOkResponse({ type: FollowOutput, isArray: true })
+  @ApiCommon()
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Put('follow/:id')
+  async follow(@Req() req, @Param('id', new ParseIntPipe()) id: number) {
+    const { hashPassword, hashRefeshToken, ...res } =
+      await this.userService.follow(req.user.id, id);
+    return res.following.map((v) => {
+      return {
+        id: v.id,
+        displayName: v.displayName,
+        avatarUrl: v.avatarUrl,
+      };
+    });
+  }
+
+  @ApiParam({
+    name: 'id',
+    description: 'Id of the user that the current user want to unfollow',
+  })
+  @ApiCommon()
+  @ApiOkResponse({ type: UnfollowOutput, isArray: true })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Put('unfollow/:id')
+  async unfollow(@Req() req, @Param('id', new ParseIntPipe()) id: number) {
+    const { hashPassword, hashRefeshToken, ...res } =
+      await this.userService.unfollow(req.user.id, id);
+    return res.following.map((v) => {
+      return {
+        id: v.id,
+        displayName: v.displayName,
+        avatarUrl: v.avatarUrl,
+      };
+    });
   }
 }
