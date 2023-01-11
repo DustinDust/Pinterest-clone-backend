@@ -30,6 +30,16 @@ export class AuthService {
     return user;
   }
 
+  async validateUserJwtToken(token: string, mode: 'refresh' | 'access') {
+    const data = await this.cryptoService.verifyJwt(token, mode);
+    if (data.id) {
+      const user = await this.userService.findOneById(data.id);
+      return user;
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
   async signInUser(id: number, username: string) {
     const accessToken = await this.cryptoService.generateJwt({
       id,

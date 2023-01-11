@@ -24,6 +24,18 @@ export class CryptoService {
     });
   }
 
+  async verifyJwt(payload: string, mode: 'access' | 'refresh') {
+    if (mode === 'access') {
+      return await this.jwtService.verifyAsync(payload, {
+        secret: this.configService.get('JWT_SECRET'),
+      });
+    } else {
+      return await this.jwtService.verifyAsync(payload, {
+        secret: this.configService.get('JWT_REFRESHSECRET'),
+      });
+    }
+  }
+
   async generateRefreshToken(payload: any) {
     return await this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_REFRESHSECRET'),

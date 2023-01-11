@@ -4,6 +4,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -38,6 +40,13 @@ export class User {
   @ApiResponseProperty()
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];
+
+  @ManyToMany((type) => User, (user) => user.following)
+  @JoinTable()
+  followers: User[];
+
+  @ManyToMany((type) => User, (user) => user.followers)
+  following: User[];
 
   @ApiResponseProperty()
   @CreateDateColumn()
