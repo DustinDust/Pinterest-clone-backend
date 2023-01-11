@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 import { PageDto } from 'src/pagination/page.dto';
 
-export class CreateSearchDto {
-  nameTag: string;
+export class UserSearchDto {
+  @IsString()
+  nameUser: string;
 
   @IsNumber()
   @IsNotEmpty()
