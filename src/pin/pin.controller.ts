@@ -34,6 +34,7 @@ import { SaveTagOutput } from './swagger/output/save-tag.output';
 import { SaveTagInput } from './swagger/input/save-tag.input';
 import { GetBoardsAndUserFromPin } from './swagger/output/get-pin-boards.output';
 import { ApiOkResponsePaginated } from 'src/pagination/pagination.output';
+import { AddCommentDto } from './dto/add-comment.dto';
 
 @ApiTags('pin')
 @Controller('pin')
@@ -124,4 +125,14 @@ export class PinController {
   ) {
     return await this.pinService.removeTagFromPin(id, dto);
   }
+
+  // @Put(':id/add-comment')
+  // @ApiBearerAuth('access-token')
+  // async addComment(
+  //   @Req() req,
+  //   @Param('id', new ParseIntPipe()) id: number,
+  //   @Body() comment: AddCommentDto,
+  // ) {
+  //   return await this.pinService.addComment(id, comment);
+  // }
 }
