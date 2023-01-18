@@ -20,6 +20,7 @@ import { SearchModule } from './search/search.module';
       useFactory: async (config: ConfigService) => {
         return {
           type: 'postgres',
+          ssl: true,
           host: config.get('DB_HOST'),
           port: config.get('DB_PORT'),
           username: config.get('DB_USERNAME'),
