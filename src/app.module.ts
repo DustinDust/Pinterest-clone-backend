@@ -10,6 +10,7 @@ import { PaginationModule } from './pagination/pagination.module';
 import { TagModule } from './tag/tag.module';
 import { ThumbnailModule } from './thumbnail/thumbnail.module';
 import { SearchModule } from './search/search.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { SearchModule } from './search/search.module';
     ThumbnailModule,
     SearchModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}
