@@ -46,8 +46,8 @@ export class User {
   @OneToMany(() => Pin, (pin) => pin.user)
   pins: Pin[]
 
-  // @OneToMany(() => Comment, (comment) => comment.user)
-  // comments: Comment[]
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[]
 
   @ManyToMany((type) => User, (user) => user.following)
   @JoinTable()

@@ -1,7 +1,6 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
-import { Visibility } from 'src/board/board.entity';
 
-export class SaveTagOutput {
+export class AddCommentOutput {
   @ApiResponseProperty()
   id: number;
   @ApiResponseProperty()
@@ -21,10 +20,16 @@ export class SaveTagOutput {
       required: ['id'],
       properties: {
         id: { type: 'integer' },
+        content: { type: 'string' },
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
       },
     },
   })
-  tags: {
+  comments: {
     id: number;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
   }[];
 }

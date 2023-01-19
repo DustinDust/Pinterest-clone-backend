@@ -10,6 +10,6 @@ import { PinModule } from 'src/pin/pin.module';
 @Module({
   controllers: [CommentController],
   providers: [CommentService],
-  imports: [TypeOrmModule.forFeature([Comment])],
+  imports: [TypeOrmModule.forFeature([Comment, User])],
 })
 export class CommentModule {}

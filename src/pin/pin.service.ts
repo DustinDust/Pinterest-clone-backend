@@ -4,6 +4,7 @@ import { Board, Visibility } from 'src/board/board.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { PageDto } from 'src/pagination/page.dto';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { User } from 'src/user/user.entity';
 import { Not, Repository } from 'typeorm';
 import { AddCommentDto } from './dto/add-comment.dto';
 import { CreateTagDto } from './dto/create-tag.dto';
@@ -16,12 +17,13 @@ export class PinService {
     @InjectRepository(Pin) private pinRepository: Repository<Pin>,
     @InjectRepository(Board) private boardRepository: Repository<Board>,
     @InjectRepository(Tag) private tagRepository: Repository<Tag>,
-    // @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectRepository(Comment) private commentRepository: Repository<Comment>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
   async getPin(id: number) {
     return await this.pinRepository.findOne({
-      relations: { tags: true },
+      relations: { tags: true, comments: true },
       where: { id: id },
     });
   }
@@ -114,26 +116,23 @@ export class PinService {
     return await this.pinRepository.save(pin);
   }
 
-  // async addComment(pinId: number, comment: AddCommentDto) {
-  //   const pin = await this.pinRepository.findOne({
-  //     relations: {
-  //       tags: true,
-  //     },
-  //     where: {
-  //       id: pinId,
-  //     },
-  //     select: {
-  //       id: true,
-  //       tags: {
-  //         id: true,
-  //       },
-  //     },
-  //   });
-  //   if (!pin) {
-  //     throw new BadRequestException('Pin does not exist');
-  //   }
-  //   // const commentTmp = this.commentRepository.create({content: comment.content});
-  //   // pin.comments = [...pin.comments, commentTmp];
-  //   return await this.pinRepository.save(pin);
-  // }
+  async addComment(pinId: number,userId: number, comment: AddCommentDto) {
+    const pin = await this.pinRepository.findOne({
+      relations: {
+        comments: true,
+      },
+      where: {
+        id: pinId,
+      },
+    });
+    if (!pin) {
+      throw new BadRequestException('Pin does not exist');
+    }
+    const commentTmp = this.commentRepository.create({content: comment.content});
+    console.log("hehe" +userId);
+    commentTmp.user = await this.userRepository.findOneBy({id: userId})
+    pin.comments = [...pin.comments, commentTmp];
+    await this.commentRepository.save(commentTmp);
+    return await this.pinRepository.save(pin);
+  }
 }
