@@ -127,7 +127,6 @@ export class BoardService {
         throw new BadRequestException('Pin must have a name.');
       }
       if (thumbtry.err) {
-        console.log(thumbtry.err);
         thumbnailUrl = url;
       } else {
         thumbnailUrl = await this.firebaseService.uploadFromBuffer(
@@ -141,10 +140,16 @@ export class BoardService {
       pin.url = url;
       pin.thumbnail = thumbnailUrl;
       pin.tags = tags;
+      const userCur = await this.userRepsitory.findOneBy({id: userId})
+      if(!userCur){
+        throw new BadRequestException('Wrong user.');
+      }else{
+        pin.user = userCur;
+      }
       await this.pinRepository.save(pin);
     } else {
       pin = await this.pinRepository.findOne({
-        relations: { tags: true },
+        relations: { tags: true, user: true },
         where: { id: pinTagDto.id },
         select: { tags: { id: true } },
       });

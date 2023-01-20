@@ -1,5 +1,6 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 import { Board } from 'src/board/board.entity';
+import { Pin } from 'src/pin/pin.entity';
 import {
   Column,
   CreateDateColumn,
@@ -40,6 +41,9 @@ export class User {
   @ApiResponseProperty()
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];
+
+  @OneToMany(() => Pin, (pin) => pin.user)
+  pins: Pin[]
 
   @ManyToMany((type) => User, (user) => user.following)
   @JoinTable()

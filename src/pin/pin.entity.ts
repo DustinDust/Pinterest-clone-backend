@@ -1,10 +1,12 @@
 import { Board } from 'src/board/board.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
+import { User } from 'src/user/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -18,6 +20,9 @@ export class Pin {
 
   @ManyToMany(() => Tag, (tag) => tag.pins)
   tags: Tag[];
+
+  @ManyToOne(() => User, (user) => user.pins)
+  user: User
 
   @Column({ nullable: false })
   url: string;
