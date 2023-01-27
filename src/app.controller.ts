@@ -5,6 +5,6 @@ export class AppController {
   @Get('/healthz')
   @HttpCode(HttpStatus.OK)
   healthCheck() {
-    return { hello: 'world' };
+    return 'OK';
   }
 }

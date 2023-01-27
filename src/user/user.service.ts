@@ -8,6 +8,8 @@ import { DeepPartial, Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserGateway } from './user.gateway';
+import { UpdatesService } from 'src/updates/updates.service';
+import { Update } from 'src/updates/update.entity';
 
 @Injectable()
 export class UserService {
@@ -15,6 +17,8 @@ export class UserService {
     @InjectRepository(User)
     private userRepo: Repository<User>,
     private userGateway: UserGateway,
+    @InjectRepository(Update)
+    private updateRepository: Repository<Update>,
   ) {}
 
   async findOneById(id: number) {
@@ -107,13 +111,18 @@ export class UserService {
       user.following.push(followUser);
       const res = await this.userRepo.save(user);
       try {
+        const update = this.updateRepository.create();
+        update.data = JSON.stringify({
+          id: user.id,
+          displayName: user.displayName,
+          avatarUrl: user.avatarUrl,
+        });
+        update.event = 'follow';
+        update.user = followUser;
+        await this.updateRepository.save(update);
         this.userGateway.server.emit(`${followUser.id}`, {
-          event: 'follow',
-          data: {
-            id: user.id,
-            displayName: user.displayName,
-            avatarUrl: user.avatarUrl,
-          },
+          event: update.event,
+          data: JSON.parse(update.data),
         });
       } catch (err: any) {
         console.log(err);

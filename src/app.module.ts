@@ -11,6 +11,7 @@ import { TagModule } from './tag/tag.module';
 import { ThumbnailModule } from './thumbnail/thumbnail.module';
 import { SearchModule } from './search/search.module';
 import { AppController } from './app.controller';
+import { UpdatesModule } from './updates/updates.module';
 import { CommentModule } from './comment/comment.module';
 
 @Module({
@@ -42,6 +43,7 @@ import { CommentModule } from './comment/comment.module';
     PaginationModule,
     ThumbnailModule,
     SearchModule,
+    UpdatesModule,
     CommentModule,
   ],
   controllers: [AppController],

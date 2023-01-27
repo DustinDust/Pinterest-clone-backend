@@ -6,6 +6,7 @@ import {
   HttpStatus,
   InternalServerErrorException,
   Post,
+  Req,
   Request,
   UploadedFile,
   UseGuards,
@@ -138,5 +139,16 @@ export class AuthController {
         await this.authService.signUpUser(dto);
       return res;
     }
+  }
+
+  @ApiBearerAuth('access-token')
+  @ApiOkResponse({
+    description: 'Successfully sign user out',
+  })
+  @ApiCommon()
+  @UseGuards(JwtAuthGuard)
+  @Post('sign-out/')
+  async signOut(@Request() req) {
+    await this.signOut(req.user.id);
   }
 }

@@ -6,7 +6,9 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  Query,
   Req,
+  Request,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -35,6 +37,11 @@ import { UnfollowOutput } from './swagger/output/unfollow.output';
 import { FollowOutput } from './swagger/output/follow.output';
 import { GetFollowersOutput } from './swagger/output/get-followers.output';
 import { GetFollowingOutput } from './swagger/output/get-following.output';
+import { UpdatesService } from 'src/updates/updates.service';
+import { PageDto } from 'src/pagination/page.dto';
+import { PaginationService } from 'src/pagination/pagination.service';
+import { GetUpdatesOutput } from './swagger/output/get-updates.output';
+import { ApiOkResponsePaginated } from 'src/pagination/pagination.output';
 
 @ApiTags('user')
 @Controller('user')
@@ -42,7 +49,28 @@ export class UserController {
   constructor(
     private userService: UserService,
     private firebaseService: FirebaseService,
+    private updateService: UpdatesService,
+    private pagingService: PaginationService,
   ) {}
+
+  @ApiCommon()
+  @ApiOkResponsePaginated(GetUpdatesOutput, true)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @Get('updates')
+  async getUpdates(@Request() req, @Query() pageDto: PageDto) {
+    const res = await this.updateService.findAllByUserId(req.user.id, pageDto);
+    return this.pagingService.makePaginatedResponse(
+      pageDto,
+      res.data.map((v) => {
+        return {
+          ...v,
+          data: JSON.parse(v.data),
+        };
+      }),
+      res.count,
+    );
+  }
 
   @ApiOperation({
     summary: 'get current user',
