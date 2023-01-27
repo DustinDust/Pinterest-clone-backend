@@ -30,4 +30,23 @@ export class GetPinOutput {
     createdAt: Date;
     updatedAt: Date;
   }[];
+  @ApiProperty({
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['id'],
+      properties: {
+        id: { type: 'integer' },
+        content: { type: 'string' },
+        createdAt: { type: 'date' },
+        updatedAt: { type: 'date' },
+      },
+    },
+  })
+  comments: {
+    id: number;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
 }

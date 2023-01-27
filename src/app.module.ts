@@ -12,6 +12,7 @@ import { ThumbnailModule } from './thumbnail/thumbnail.module';
 import { SearchModule } from './search/search.module';
 import { AppController } from './app.controller';
 import { UpdatesModule } from './updates/updates.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { UpdatesModule } from './updates/updates.module';
     ThumbnailModule,
     SearchModule,
     UpdatesModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [],
