@@ -140,10 +140,10 @@ export class BoardService {
       pin.url = url;
       pin.thumbnail = thumbnailUrl;
       pin.tags = tags;
-      const userCur = await this.userRepsitory.findOneBy({id: userId})
-      if(!userCur){
+      const userCur = await this.userRepsitory.findOneBy({ id: userId });
+      if (!userCur) {
         throw new BadRequestException('Wrong user.');
-      }else{
+      } else {
         pin.user = userCur;
       }
       await this.pinRepository.save(pin);

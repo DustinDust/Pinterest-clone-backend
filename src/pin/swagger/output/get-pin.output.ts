@@ -30,6 +30,25 @@ export class GetPinOutput {
     createdAt: Date;
     updatedAt: Date;
   }[];
+
+  @ApiProperty({
+    type: 'object',
+    properties: {
+      id: { type: 'number' },
+      username: { type: 'string' },
+      displayName: { type: 'string' },
+      avatarUrl: { type: 'string' },
+      followersCount: { type: 'number' },
+    },
+  })
+  user: {
+    id: number;
+    username: string;
+    displayName: string;
+    avatarUrl: string;
+    followersCount: number;
+  };
+
   @ApiProperty({
     type: 'array',
     items: {
@@ -38,8 +57,17 @@ export class GetPinOutput {
       properties: {
         id: { type: 'integer' },
         content: { type: 'string' },
-        createdAt: { type: 'date' },
-        updatedAt: { type: 'date' },
+        createdAt: { type: 'string', format: 'date-time' },
+        updatedAt: { type: 'string', format: 'date-time' },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            username: { type: 'string' },
+            displayName: { type: 'string' },
+            avatarUrl: { type: 'string' },
+          },
+        },
       },
     },
   })
@@ -48,5 +76,11 @@ export class GetPinOutput {
     content: string;
     createdAt: Date;
     updatedAt: Date;
+    user: {
+      id: number;
+      username: string;
+      displayName: string;
+      avatarUrl: string;
+    };
   }[];
 }

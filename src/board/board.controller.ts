@@ -139,12 +139,18 @@ export class BoardController {
     @UploadedFile() imageFile: Express.Multer.File,
     @Body() pinTagDto: AddPinWithTagDto,
   ) {
-    return await this.boardService.savePinToBoard(
+    const data = await this.boardService.savePinToBoard(
       req.user.id,
       pinTagDto,
       id,
       imageFile,
     );
+    return {
+      ...data,
+      pins: data.pins.map((v) => ({
+        id: v.id,
+      })),
+    };
   }
 
   @ApiOkResponsePaginated(GetAllBoardOutput, true)

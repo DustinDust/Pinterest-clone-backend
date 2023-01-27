@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board, Visibility } from 'src/board/board.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
@@ -22,10 +26,61 @@ export class PinService {
   ) {}
 
   async getPin(id: number) {
-    return await this.pinRepository.findOne({
-      relations: { tags: true, comments: true },
+    const data = await this.pinRepository.findOne({
+      relations: {
+        tags: true,
+        comments: {
+          user: true,
+        },
+        user: true,
+      },
       where: { id: id },
+      select: {
+        comments: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          user: {
+            id: true,
+            displayName: true,
+            username: true,
+            avatarUrl: true,
+          },
+        },
+      },
     });
+    if (!data) {
+      throw new NotFoundException('No such pin');
+    }
+    if (data.user) {
+      const [_, count] = await this.userRepository.findAndCount({
+        relations: {
+          following: true,
+        },
+        where: {
+          following: {
+            id: data.user.id,
+          },
+        },
+      });
+      return {
+        ...data,
+        user: {
+          ...data.user,
+          followersCount: count,
+          hashPassword: undefined,
+          hashRefeshToken: undefined,
+        },
+      };
+    } else {
+      return {
+        ...data,
+        user: {
+          ...data.user,
+        },
+      };
+    }
   }
 
   async getBoardsByPin(id: number, userId: number, page: PageDto) {
