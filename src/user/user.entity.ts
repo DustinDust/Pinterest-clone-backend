@@ -8,6 +8,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -36,7 +37,6 @@ export class User {
   @OneToMany(() => Board, (board) => board.user)
   boards: Board[];
 
-  @ManyToMany(() => User, (user) => user.following)
   @OneToMany(() => Pin, (pin) => pin.user)
   pins: Pin[];
 

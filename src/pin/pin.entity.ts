@@ -24,11 +24,10 @@ export class Pin {
   tags: Tag[];
 
   @ManyToOne(() => User, (user) => user.pins)
-  user: User
+  user: User;
 
   @OneToMany(() => Comment, (comment) => comment.pin)
-  
-  comments: Comment[]
+  comments: Comment[];
 
   @Column({ nullable: false })
   url: string;
