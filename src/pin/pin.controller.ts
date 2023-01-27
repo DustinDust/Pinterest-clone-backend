@@ -134,8 +134,7 @@ export class PinController {
   @ApiCommon()
   @ApiOperation({
     summary: 'Add comment',
-    description:
-      'Add a comment for a pin',
+    description: 'Add a comment for a pin',
   })
   @ApiParam({
     name: 'id',
@@ -150,6 +149,6 @@ export class PinController {
     @Param('id', new ParseIntPipe()) id: number,
     @Body() comment: AddCommentDto,
   ) {
-    return await this.pinService.addComment(id, req.user.id , comment);
+    return await this.pinService.addComment(id, req.user.id, comment);
   }
 }

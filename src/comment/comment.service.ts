@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 
@@ -11,19 +10,23 @@ export class CommentService {
     @InjectRepository(Comment) private commentRepository: Repository<Comment>,
   ) {}
 
-  async update(commentId: number, userId: number, updateCommentDto: UpdateCommentDto) {
+  async update(
+    commentId: number,
+    userId: number,
+    updateCommentDto: UpdateCommentDto,
+  ) {
     let updatedComment = await this.commentRepository.findOne({
       relations: {
         user: true,
       },
       where: {
-        id: commentId
+        id: commentId,
       },
     });
     console.log(updatedComment);
-    if(userId == updatedComment.user.id){
+    if (userId == updatedComment.user.id) {
       await this.commentRepository.update(commentId, updateCommentDto);
-    }else{
+    } else {
       throw new BadRequestException('This comment is not yours');
     }
     updatedComment = await this.commentRepository.findOneBy({ id: commentId });
@@ -39,15 +42,15 @@ export class CommentService {
         user: true,
       },
       where: {
-        id: commentId
+        id: commentId,
       },
     });
     if (!comment) {
       throw new BadRequestException('Comment not found!');
     }
-    if(comment.user.id == userId){
+    if (comment.user.id == userId) {
       return await this.commentRepository.delete({ id: commentId });
-    }else{
+    } else {
       throw new BadRequestException(' This comment is not yours');
     }
   }

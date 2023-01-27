@@ -49,7 +49,7 @@ export class SearchController {
   @UseGuards(JwtAuthGuard)
   @Get('user')
   @ApiBearerAuth('access-token')
-  async findUserWithDisplayName(@Query() userName: UserSearchDto){
+  async findUserWithDisplayName(@Query() userName: UserSearchDto) {
     const data = await this.searchService.findUserByDisplayName(userName);
     const page = {
       pageNum: userName.pageNum,

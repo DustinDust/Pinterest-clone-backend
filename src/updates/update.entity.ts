@@ -15,13 +15,16 @@ export class Update {
   @ManyToOne(() => User, (user) => user.updates)
   user: User;
 
-  @Column()
+  @Column({ nullable: true })
+  event: string;
+
+  @Column({ nullable: true })
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   text: string;
 
-  @Column()
+  @Column({ nullable: true })
   data: string;
 
   @CreateDateColumn()

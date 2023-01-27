@@ -1,9 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Body,
+  Param,
+  Delete,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards';
 import { ApiCommon } from 'src/decorators/common-api.docs';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { UpdateCommentInput } from './swagger/input/update-comment.input';
 import { DeleteCommentOutput } from './swagger/output/delete-comment.output';
@@ -18,7 +32,7 @@ export class CommentController {
   @ApiBody({ type: UpdateCommentInput })
   @ApiOperation({
     summary: 'update comment',
-    description: 'update content comment if you are own',
+    description: "update comment content given that you're authorized",
   })
   @ApiParam({
     name: 'id',
@@ -30,16 +44,17 @@ export class CommentController {
   async update(
     @Req() req,
     @Param('id') id: number,
-    @Body() updateTagDto: UpdateCommentDto
+    @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    return await this.commentService.update(id, req.user.id, updateTagDto);
+    return await this.commentService.update(id, req.user.id, updateCommentDto);
   }
 
   @ApiOkResponse({ type: DeleteCommentOutput })
   @ApiCommon()
   @ApiOperation({
     summary: 'delete a comment',
-    description: 'delete a comment with provided id and authorization token and own',
+    description:
+      'delete a comment with provided id and authorization token and own',
   })
   @ApiParam({
     name: 'id',
@@ -48,10 +63,7 @@ export class CommentController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiBearerAuth('access-token')
-  async removeTag(
-    @Req() req,
-    @Param('id') id: number
-  ) {
+  async removeComment(@Req() req, @Param('id') id: number) {
     return await this.commentService.remove(id, req.user.id);
   }
 }

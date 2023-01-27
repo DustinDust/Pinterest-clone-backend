@@ -20,6 +20,17 @@ export class UpdatesService {
           id: user_id,
         },
       },
+      select: {
+        user: {
+          id: true,
+        },
+        createdAt: true,
+        data: true,
+        text: true,
+        title: true,
+        id: true,
+        event: true,
+      },
       skip: page.pageSize * (page.pageNum - 1),
       take: page.pageSize,
     });

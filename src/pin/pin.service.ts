@@ -116,7 +116,7 @@ export class PinService {
     return await this.pinRepository.save(pin);
   }
 
-  async addComment(pinId: number,userId: number, comment: AddCommentDto) {
+  async addComment(pinId: number, userId: number, comment: AddCommentDto) {
     const pin = await this.pinRepository.findOne({
       relations: {
         comments: true,
@@ -128,9 +128,11 @@ export class PinService {
     if (!pin) {
       throw new BadRequestException('Pin does not exist');
     }
-    const commentTmp = this.commentRepository.create({content: comment.content});
-    console.log("hehe" +userId);
-    commentTmp.user = await this.userRepository.findOneBy({id: userId})
+    const commentTmp = this.commentRepository.create({
+      content: comment.content,
+    });
+    console.log('hehe' + userId);
+    commentTmp.user = await this.userRepository.findOneBy({ id: userId });
     pin.comments = [...pin.comments, commentTmp];
     await this.commentRepository.save(commentTmp);
     return await this.pinRepository.save(pin);
