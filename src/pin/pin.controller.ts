@@ -57,7 +57,7 @@ export class PinController {
     return await this.pinService.getPin(id);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @Get(':id/boards')
   @ApiParam({
     name: 'id',

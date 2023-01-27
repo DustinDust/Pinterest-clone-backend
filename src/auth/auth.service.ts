@@ -102,4 +102,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
+
+  async signOut(userId: number) {
+    return await this.userService.updateUser(userId, {
+      hashRefeshToken: null,
+      deviceToken: null,
+    });
+  }
 }

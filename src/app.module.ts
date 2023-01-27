@@ -11,6 +11,7 @@ import { TagModule } from './tag/tag.module';
 import { ThumbnailModule } from './thumbnail/thumbnail.module';
 import { SearchModule } from './search/search.module';
 import { AppController } from './app.controller';
+import { UpdatesModule } from './updates/updates.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AppController } from './app.controller';
     PaginationModule,
     ThumbnailModule,
     SearchModule,
+    UpdatesModule,
   ],
   controllers: [AppController],
   providers: [],
